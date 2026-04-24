@@ -1,8 +1,8 @@
 package co.com.bancolombia.api.product;
 
 import co.com.bancolombia.api.product.dto.CreateProductRequestDTO;
+import co.com.bancolombia.api.product.dto.PatchProductRequestDTO;
 import co.com.bancolombia.api.product.dto.ProductResponseDTO;
-import co.com.bancolombia.api.product.dto.UpdateProductStockRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -93,7 +93,7 @@ public class ProductRouterRest {
                             requestBody = @RequestBody(
                                     required = true,
                                     description = "Fields to patch for the product",
-                                    content = @Content(schema = @Schema(implementation = UpdateProductStockRequestDTO.class))
+                                    content = @Content(schema = @Schema(implementation = PatchProductRequestDTO.class))
                             ),
                             responses = {
                                     @ApiResponse(responseCode = "200", description = "Product updated",

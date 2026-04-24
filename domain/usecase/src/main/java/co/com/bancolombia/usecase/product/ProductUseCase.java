@@ -58,17 +58,29 @@ public class ProductUseCase {
                 });
     }
 
-    public Mono<Product> updateStock(Long idProduct, Integer stockQuantity) {
+    public Mono<Product> patch(Long idProduct, String name, Integer stockQuantity) {
         if (idProduct == null || idProduct <= 0) {
             return Mono.error(new BusinessException(BusinessErrorType.INVALID_INPUT, "Product id is required"));
         }
 
-        return Mono.fromCallable(() -> sanitizeStockQuantity(stockQuantity))
-                .flatMap(sanitizedStockQuantity -> productRepository.findProductById(idProduct)
-                        .switchIfEmpty(Mono.error(new BusinessException(BusinessErrorType.PRODUCT_NOT_FOUND)))
-                        .flatMap(product -> productRepository.save(product.toBuilder()
-                                .stockQuantity(sanitizedStockQuantity)
-                                .build())));
+        if (name == null && stockQuantity == null) {
+            return Mono.error(new BusinessException(BusinessErrorType.INVALID_INPUT, "At least one field to update is required"));
+        }
+
+        return productRepository.findProductById(idProduct)
+                .switchIfEmpty(Mono.error(new BusinessException(BusinessErrorType.PRODUCT_NOT_FOUND)))
+                .flatMap(product -> {
+                    Product.ProductBuilder builder = product.toBuilder();
+
+                    if (name != null) {
+                        builder.name(sanitizeName(name));
+                    }
+                    if (stockQuantity != null) {
+                        builder.stockQuantity(sanitizeStockQuantity(stockQuantity));
+                    }
+
+                    return productRepository.save(builder.build());
+                });
     }
 
     private String sanitizeName(String name) {

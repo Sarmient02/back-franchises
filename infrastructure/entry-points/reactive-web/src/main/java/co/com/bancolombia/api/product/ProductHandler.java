@@ -3,7 +3,7 @@ package co.com.bancolombia.api.product;
 import co.com.bancolombia.api.common.RequestValidator;
 import co.com.bancolombia.api.common.ResponseUtil;
 import co.com.bancolombia.api.product.dto.CreateProductRequestDTO;
-import co.com.bancolombia.api.product.dto.UpdateProductStockRequestDTO;
+import co.com.bancolombia.api.product.dto.PatchProductRequestDTO;
 import co.com.bancolombia.api.product.mappers.ProductMapper;
 import co.com.bancolombia.model.exception.BusinessErrorType;
 import co.com.bancolombia.model.exception.BusinessException;
@@ -45,9 +45,9 @@ public class ProductHandler {
     public Mono<ServerResponse> patchProduct(ServerRequest request) {
         Long idProduct = parsePathVariable(request, "idProduct");
 
-        return request.bodyToMono(UpdateProductStockRequestDTO.class)
+        return request.bodyToMono(PatchProductRequestDTO.class)
                 .doOnNext(requestValidator::validate)
-                .flatMap(body -> productUseCase.updateStock(idProduct, body.stockQuantity()))
+                .flatMap(body -> productUseCase.patch(idProduct, body.name(), body.stockQuantity()))
                 .map(productMapper::toResponse)
                 .flatMap(ResponseUtil::ok);
     }
