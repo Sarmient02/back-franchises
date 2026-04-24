@@ -1,5 +1,7 @@
 package co.com.bancolombia.r2dbc.franchise.repository;
 
+import co.com.bancolombia.model.exception.BusinessErrorType;
+import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import co.com.bancolombia.r2dbc.franchise.entity.FranchiseEntity;
@@ -23,7 +25,7 @@ public class FranchiseReactiveRepositoryAdapter extends ReactiveAdapterOperation
                 .flatMap(repository::save)
                 .map(this::toEntity)
                 .onErrorMap(DuplicateKeyException.class,
-                        ex -> new IllegalStateException("Franchise name already exists"));
+                        ex -> new BusinessException(BusinessErrorType.FRANCHISE_ALREADY_EXISTS));
     }
 
     @Override

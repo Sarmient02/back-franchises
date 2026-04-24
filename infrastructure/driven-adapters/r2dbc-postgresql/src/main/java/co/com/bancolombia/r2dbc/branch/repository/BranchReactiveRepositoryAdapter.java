@@ -2,6 +2,8 @@ package co.com.bancolombia.r2dbc.branch.repository;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
+import co.com.bancolombia.model.exception.BusinessErrorType;
+import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.r2dbc.branch.entity.BranchEntity;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
@@ -24,7 +26,7 @@ public class BranchReactiveRepositoryAdapter extends ReactiveAdapterOperations<B
                 .flatMap(repository::save)
                 .map(this::toEntity)
                 .onErrorMap(DuplicateKeyException.class,
-                        ex -> new IllegalStateException("Branch name already exists for this franchise"));
+                        ex -> new BusinessException(BusinessErrorType.BRANCH_ALREADY_EXISTS));
     }
 
     @Override

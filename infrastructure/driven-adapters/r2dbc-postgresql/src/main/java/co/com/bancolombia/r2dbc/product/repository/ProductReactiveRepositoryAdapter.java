@@ -1,5 +1,7 @@
 package co.com.bancolombia.r2dbc.product.repository;
 
+import co.com.bancolombia.model.exception.BusinessErrorType;
+import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.TopStockProductByBranch;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
@@ -26,7 +28,7 @@ public class ProductReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                 .flatMap(repository::save)
                 .map(this::toEntity)
                 .onErrorMap(DuplicateKeyException.class,
-                        ex -> new IllegalStateException("Product name already exists for this branch"));
+                        ex -> new BusinessException(BusinessErrorType.PRODUCT_ALREADY_EXISTS));
     }
 
     @Override
