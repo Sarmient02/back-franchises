@@ -39,6 +39,12 @@ public class BranchReactiveRepositoryAdapter extends ReactiveAdapterOperations<B
         return repository.existsById(idBranch);
     }
 
+    @Override
+    public Mono<Branch> findById(Long idBranch) {
+        return repository.findById(idBranch)
+                .map(this::toEntity);
+    }
+
 }
 
 

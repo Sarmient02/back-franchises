@@ -37,6 +37,19 @@ public class BranchUseCase {
                         }));
     }
 
+    public Mono<Branch> updateName(Long idBranch, String name) {
+        if (idBranch == null || idBranch <= 0) {
+            return Mono.error(new BusinessException(BusinessErrorType.INVALID_INPUT, "Branch id is required"));
+        }
+
+        return Mono.fromCallable(() -> sanitizeName(name))
+                .flatMap(sanitizedName -> branchRepository.findById(idBranch)
+                        .switchIfEmpty(Mono.error(new BusinessException(BusinessErrorType.BRANCH_NOT_FOUND)))
+                        .flatMap(branch -> branchRepository.save(branch.toBuilder()
+                                .name(sanitizedName)
+                                .build())));
+    }
+
     private String sanitizeName(String name) {
         if (name == null || name.isBlank()) {
             throw new BusinessException(BusinessErrorType.INVALID_INPUT, "Branch name is required");

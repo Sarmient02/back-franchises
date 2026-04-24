@@ -7,6 +7,8 @@ public interface BranchRepository {
 
     Mono<Branch> save(Branch branch);
 
+    Mono<Branch> findById(Long idBranch);
+
     Mono<Boolean> existsByIdFranchiseAndName(Long idFranchise, String name);
 
     Mono<Boolean> existsById(Long idBranch);

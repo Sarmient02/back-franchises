@@ -1,6 +1,7 @@
 package co.com.bancolombia.api.branch;
 
 import co.com.bancolombia.api.branch.dto.CreateBranchRequestDTO;
+import co.com.bancolombia.api.branch.dto.UpdateBranchNameRequestDTO;
 import co.com.bancolombia.api.branch.mappers.BranchMapper;
 import co.com.bancolombia.api.common.RequestValidator;
 import co.com.bancolombia.api.common.ResponseUtil;
@@ -30,6 +31,16 @@ public class BranchHandler {
                 .flatMap(branchUseCase::create)
                 .map(branchMapper::toResponse)
                 .flatMap(ResponseUtil::created);
+    }
+
+    public Mono<ServerResponse> patchBranch(ServerRequest request) {
+        Long idBranch = parsePathVariable(request, "idBranch");
+
+        return request.bodyToMono(UpdateBranchNameRequestDTO.class)
+                .doOnNext(requestValidator::validate)
+                .flatMap(body -> branchUseCase.updateName(idBranch, body.name()))
+                .map(branchMapper::toResponse)
+                .flatMap(ResponseUtil::ok);
     }
 
     private Long parsePathVariable(ServerRequest request, String name) {
