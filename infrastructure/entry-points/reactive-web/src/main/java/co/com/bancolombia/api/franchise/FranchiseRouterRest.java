@@ -25,7 +25,22 @@ public class FranchiseRouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
-                    path = "/franchises",
+                    path = "/api/franchises",
+                    method = RequestMethod.GET,
+                    beanClass = FranchiseHandler.class,
+                    beanMethod = "getAllFranchises",
+                    operation = @Operation(
+                            operationId = "getAllFranchises",
+                            summary = "Get all franchises",
+                            tags = {"Franchise"},
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Successful operation",
+                                            content = @Content(array = @ArraySchema(
+                                                    schema = @Schema(implementation = FranchiseResponseDTO.class))))
+                            }
+                    )),
+            @RouterOperation(
+                    path = "/api/franchises",
                     method = RequestMethod.POST,
                     beanClass = FranchiseHandler.class,
                     beanMethod = "createFranchise",
@@ -43,7 +58,7 @@ public class FranchiseRouterRest {
                                             content = @Content(schema = @Schema(implementation = FranchiseResponseDTO.class)))}
                     )),
             @RouterOperation(
-                    path = "/franchises/{idFranchise}",
+                    path = "/api/franchises/{idFranchise}",
                     method = RequestMethod.PATCH,
                     beanClass = FranchiseHandler.class,
                     beanMethod = "patchFranchise",
@@ -72,7 +87,7 @@ public class FranchiseRouterRest {
                             }
                     )),
             @RouterOperation(
-                    path = "/franchises/{idFranchise}/products/top-stock-by-branch",
+                    path = "/api/franchises/{idFranchise}/products/top-stock-by-branch",
                     method = RequestMethod.GET,
                     beanClass = FranchiseHandler.class,
                     beanMethod = "getTopStockProductsByBranch",
@@ -98,9 +113,12 @@ public class FranchiseRouterRest {
     )
     public RouterFunction<ServerResponse> franchiseRoutes(FranchiseHandler handler) {
         return route()
-                .POST("/franchises", handler::createFranchise)
-                .PATCH("/franchises/{idFranchise}", handler::patchFranchise)
-                .GET("/franchises/{idFranchise}/products/top-stock-by-branch", handler::getTopStockProductsByBranch)
+                .path("/api", builder -> builder
+                        .GET("/franchises", handler::getAllFranchises)
+                        .POST("/franchises", handler::createFranchise)
+                        .PATCH("/franchises/{idFranchise}", handler::patchFranchise)
+                        .GET("/franchises/{idFranchise}/products/top-stock-by-branch", handler::getTopStockProductsByBranch)
+                )
                 .build();
     }
 }

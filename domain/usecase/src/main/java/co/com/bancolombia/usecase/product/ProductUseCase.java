@@ -6,6 +6,7 @@ import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -42,6 +43,16 @@ public class ProductUseCase {
                             }
                             return productRepository.save(sanitizedProduct);
                         }));
+    }
+
+    public Flux<Product> getAll(Long idBranch) {
+        if (idBranch == null) {
+            return productRepository.findAll();
+        }
+        if (idBranch <= 0) {
+            return Flux.error(new BusinessException(BusinessErrorType.INVALID_INPUT, "Branch id must be greater than 0"));
+        }
+        return productRepository.findAllByIdBranch(idBranch);
     }
 
     public Mono<Void> deleteById(Long idProduct) {

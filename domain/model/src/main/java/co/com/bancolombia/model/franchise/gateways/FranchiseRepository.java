@@ -1,6 +1,7 @@
 package co.com.bancolombia.model.franchise.gateways;
 
 import co.com.bancolombia.model.franchise.Franchise;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface FranchiseRepository {
@@ -10,5 +11,7 @@ public interface FranchiseRepository {
     Mono<Franchise> findById(Long idFranchise);
 
     Mono<Boolean> existsById(Long idFranchise);
+
+    Flux<Franchise> findAll();
 
 }

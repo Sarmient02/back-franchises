@@ -64,4 +64,14 @@ public class ProductReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                         .build());
     }
 
+    @Override
+    public Flux<Product> findAll() {
+        return repository.findAll().map(this::toEntity);
+    }
+
+    @Override
+    public Flux<Product> findAllByIdBranch(Long idBranch) {
+        return repository.findAllByIdBranch(idBranch).map(this::toEntity);
+    }
+
 }

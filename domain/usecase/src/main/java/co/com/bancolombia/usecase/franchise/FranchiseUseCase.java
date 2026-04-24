@@ -25,6 +25,10 @@ public class FranchiseUseCase {
         return franchiseRepository.save(franchise);
     }
 
+    public Flux<Franchise> getAll() {
+        return franchiseRepository.findAll();
+    }
+
     public Mono<Franchise> updateName(Long idFranchise, String name) {
         if (idFranchise == null || idFranchise <= 0) {
             return Mono.error(new BusinessException(BusinessErrorType.INVALID_INPUT, "Franchise id is required"));

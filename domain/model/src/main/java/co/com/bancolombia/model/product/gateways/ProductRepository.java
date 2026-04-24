@@ -19,4 +19,8 @@ public interface ProductRepository {
 
     Flux<TopStockProductByBranch> findTopStockProductsByFranchiseId(Long idFranchise);
 
+    Flux<Product> findAll();
+
+    Flux<Product> findAllByIdBranch(Long idBranch);
+
 }

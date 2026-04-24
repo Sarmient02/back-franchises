@@ -4,6 +4,7 @@ import co.com.bancolombia.api.branch.dto.BranchResponseDTO;
 import co.com.bancolombia.api.branch.dto.CreateBranchRequestDTO;
 import co.com.bancolombia.api.branch.dto.UpdateBranchNameRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -24,7 +25,30 @@ public class BranchRouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
-                    path = "/franchises/{idFranchise}/branches",
+                    path = "/api/branches",
+                    method = RequestMethod.GET,
+                    beanClass = BranchHandler.class,
+                    beanMethod = "getAllBranches",
+                    operation = @Operation(
+                            operationId = "getAllBranches",
+                            summary = "Get all branches",
+                            tags = {"Branch"},
+                            parameters = {
+                                    @io.swagger.v3.oas.annotations.Parameter(
+                                            name = "idFranchise",
+                                            description = "Optional ID of the franchise to filter branches",
+                                            required = false,
+                                            in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY
+                                    )
+                            },
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Successful operation",
+                                            content = @Content(array = @ArraySchema(
+                                                    schema = @Schema(implementation = BranchResponseDTO.class))))
+                            }
+                    )),
+            @RouterOperation(
+                    path = "/api/franchises/{idFranchise}/branches",
                     method = RequestMethod.POST,
                     beanClass = BranchHandler.class,
                     beanMethod = "createBranch",
@@ -52,7 +76,7 @@ public class BranchRouterRest {
                             }
                     )),
             @RouterOperation(
-                    path = "/branches/{idBranch}",
+                    path = "/api/branches/{idBranch}",
                     method = RequestMethod.PATCH,
                     beanClass = BranchHandler.class,
                     beanMethod = "patchBranch",
@@ -83,8 +107,11 @@ public class BranchRouterRest {
     })
     public RouterFunction<ServerResponse> branchRoutes(BranchHandler handler) {
         return route()
-                .POST("/franchises/{idFranchise}/branches", handler::createBranch)
-                .PATCH("/branches/{idBranch}", handler::patchBranch)
+                .path("/api", builder -> builder
+                        .GET("/branches", handler::getAllBranches)
+                        .POST("/franchises/{idFranchise}/branches", handler::createBranch)
+                        .PATCH("/branches/{idBranch}", handler::patchBranch)
+                )
                 .build();
     }
 

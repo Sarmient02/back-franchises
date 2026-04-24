@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -242,4 +243,39 @@ class ProductUseCaseTest {
                 })
                 .verify();
     }
+
+    /* getAll */
+
+    @Test
+    void shouldGetAllProductsWhenBranchIdIsNull() {
+        Product product = Product.builder().id(1L).idBranch(1L).name("Big Mac").stockQuantity(10).build();
+
+        when(productRepository.findAll()).thenReturn(Flux.just(product));
+
+        StepVerifier.create(productUseCase.getAll(null))
+                .expectNext(product)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldGetAllProductsByBranchId() {
+        Product product = Product.builder().id(1L).idBranch(1L).name("Big Mac").stockQuantity(10).build();
+
+        when(productRepository.findAllByIdBranch(1L)).thenReturn(Flux.just(product));
+
+        StepVerifier.create(productUseCase.getAll(1L))
+                .expectNext(product)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFailGetAllWhenBranchIdIsInvalid() {
+        StepVerifier.create(productUseCase.getAll(0L))
+                .expectErrorSatisfies(ex -> {
+                    assertThat(ex).isInstanceOf(BusinessException.class);
+                    assertThat(((BusinessException) ex).getType()).isEqualTo(BusinessErrorType.INVALID_INPUT);
+                })
+                .verify();
+    }
+
 }

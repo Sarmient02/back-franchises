@@ -51,6 +51,13 @@ public class FranchiseHandler {
                 .flatMap(ResponseUtil::ok);
     }
 
+    public Mono<ServerResponse> getAllFranchises(ServerRequest request) {
+        return franchiseUseCase.getAll()
+                .map(franchiseMapper::toResponse)
+                .collectList()
+                .flatMap(ResponseUtil::ok);
+    }
+
     private Long parsePathVariable(ServerRequest request, String name) {
         try {
             return Long.parseLong(request.pathVariable(name));

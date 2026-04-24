@@ -52,6 +52,22 @@ public class ProductHandler {
                 .flatMap(ResponseUtil::ok);
     }
 
+    public Mono<ServerResponse> getAllProducts(ServerRequest request) {
+        Long idBranch = request.queryParam("idBranch")
+                .map(id -> {
+                    try {
+                        return Long.parseLong(id);
+                    } catch (NumberFormatException e) {
+                        throw new BusinessException(BusinessErrorType.INVALID_INPUT, "idBranch must be a number");
+                    }
+                }).orElse(null);
+
+        return productUseCase.getAll(idBranch)
+                .map(productMapper::toResponse)
+                .collectList()
+                .flatMap(ResponseUtil::ok);
+    }
+
     private Long parsePathVariable(ServerRequest request, String name) {
         try {
             return Long.parseLong(request.pathVariable(name));

@@ -43,6 +43,22 @@ public class BranchHandler {
                 .flatMap(ResponseUtil::ok);
     }
 
+    public Mono<ServerResponse> getAllBranches(ServerRequest request) {
+        Long idFranchise = request.queryParam("idFranchise")
+                .map(id -> {
+                    try {
+                        return Long.parseLong(id);
+                    } catch (NumberFormatException e) {
+                        throw new BusinessException(BusinessErrorType.INVALID_INPUT, "idFranchise must be a number");
+                    }
+                }).orElse(null);
+
+        return branchUseCase.getAll(idFranchise)
+                .map(branchMapper::toResponse)
+                .collectList()
+                .flatMap(ResponseUtil::ok);
+    }
+
     private Long parsePathVariable(ServerRequest request, String name) {
         try {
             return Long.parseLong(request.pathVariable(name));

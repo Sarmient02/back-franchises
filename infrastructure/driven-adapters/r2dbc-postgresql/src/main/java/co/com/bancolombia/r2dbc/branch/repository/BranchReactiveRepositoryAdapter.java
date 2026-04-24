@@ -9,6 +9,7 @@ import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -43,6 +44,16 @@ public class BranchReactiveRepositoryAdapter extends ReactiveAdapterOperations<B
     public Mono<Branch> findById(Long idBranch) {
         return repository.findById(idBranch)
                 .map(this::toEntity);
+    }
+
+    @Override
+    public Flux<Branch> findAll() {
+        return repository.findAll().map(this::toEntity);
+    }
+
+    @Override
+    public Flux<Branch> findAllByIdFranchise(Long idFranchise) {
+        return repository.findAllByIdFranchise(idFranchise).map(this::toEntity);
     }
 
 }

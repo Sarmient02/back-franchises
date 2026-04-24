@@ -4,6 +4,7 @@ import co.com.bancolombia.api.product.dto.CreateProductRequestDTO;
 import co.com.bancolombia.api.product.dto.PatchProductRequestDTO;
 import co.com.bancolombia.api.product.dto.ProductResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -24,7 +25,30 @@ public class ProductRouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
-                    path = "/branches/{idBranch}/products",
+                    path = "/api/products",
+                    method = RequestMethod.GET,
+                    beanClass = ProductHandler.class,
+                    beanMethod = "getAllProducts",
+                    operation = @Operation(
+                            operationId = "getAllProducts",
+                            summary = "Get all products",
+                            tags = {"Product"},
+                            parameters = {
+                                    @io.swagger.v3.oas.annotations.Parameter(
+                                            name = "idBranch",
+                                            description = "Optional ID of the branch to filter products",
+                                            required = false,
+                                            in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY
+                                    )
+                            },
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Successful operation",
+                                            content = @Content(array = @ArraySchema(
+                                                    schema = @Schema(implementation = ProductResponseDTO.class))))
+                            }
+                    )),
+            @RouterOperation(
+                    path = "/api/branches/{idBranch}/products",
                     method = RequestMethod.POST,
                     beanClass = ProductHandler.class,
                     beanMethod = "createProduct",
@@ -52,7 +76,7 @@ public class ProductRouterRest {
                             }
                     )),
             @RouterOperation(
-                    path = "/products/{idProduct}",
+                    path = "/api/products/{idProduct}",
                     method = RequestMethod.DELETE,
                     beanClass = ProductHandler.class,
                     beanMethod = "deleteProduct",
@@ -74,7 +98,7 @@ public class ProductRouterRest {
                             }
                     )),
             @RouterOperation(
-                    path = "/products/{idProduct}",
+                    path = "/api/products/{idProduct}",
                     method = RequestMethod.PATCH,
                     beanClass = ProductHandler.class,
                     beanMethod = "patchProduct",
@@ -104,9 +128,12 @@ public class ProductRouterRest {
     })
     public RouterFunction<ServerResponse> productRoutes(ProductHandler handler) {
         return route()
-                .POST("/branches/{idBranch}/products", handler::createProduct)
-                .DELETE("/products/{idProduct}", handler::deleteProduct)
-                .PATCH("/products/{idProduct}", handler::patchProduct)
+                .path("/api", builder -> builder
+                        .GET("/products", handler::getAllProducts)
+                        .POST("/branches/{idBranch}/products", handler::createProduct)
+                        .DELETE("/products/{idProduct}", handler::deleteProduct)
+                        .PATCH("/products/{idProduct}", handler::patchProduct)
+                )
                 .build();
     }
 

@@ -13,6 +13,8 @@ public interface IProductReactiveRepository extends ReactiveCrudRepository<Produ
 
     Mono<Boolean> existsByIdBranchAndName(Long idBranch, String name);
 
+    Flux<ProductEntity> findAllByIdBranch(Long idBranch);
+
     @Query("""
             SELECT ranked.id,
                    ranked.id_branch,

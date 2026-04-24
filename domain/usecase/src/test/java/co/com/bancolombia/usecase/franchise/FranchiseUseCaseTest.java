@@ -168,4 +168,18 @@ class FranchiseUseCaseTest {
 
         verifyNoInteractions(franchiseRepository, productRepository);
     }
+
+    /* getAll */
+
+    @Test
+    void shouldGetAllFranchises() {
+        Franchise franchise = Franchise.builder().id(1L).name("McDonald's").build();
+
+        when(franchiseRepository.findAll()).thenReturn(Flux.just(franchise));
+
+        StepVerifier.create(franchiseUseCase.getAll())
+                .expectNext(franchise)
+                .verifyComplete();
+    }
+
 }

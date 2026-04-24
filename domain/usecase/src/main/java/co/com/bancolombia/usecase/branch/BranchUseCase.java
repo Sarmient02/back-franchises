@@ -6,6 +6,7 @@ import co.com.bancolombia.model.exception.BusinessErrorType;
 import co.com.bancolombia.model.exception.BusinessException;
 import co.com.bancolombia.model.franchise.gateways.FranchiseRepository;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -35,6 +36,16 @@ public class BranchUseCase {
                             }
                             return branchRepository.save(branch.toBuilder().name(branchName).build());
                         }));
+    }
+
+    public Flux<Branch> getAll(Long idFranchise) {
+        if (idFranchise == null) {
+            return branchRepository.findAll();
+        }
+        if (idFranchise <= 0) {
+            return Flux.error(new BusinessException(BusinessErrorType.INVALID_INPUT, "Franchise id must be greater than 0"));
+        }
+        return branchRepository.findAllByIdFranchise(idFranchise);
     }
 
     public Mono<Branch> updateName(Long idBranch, String name) {
