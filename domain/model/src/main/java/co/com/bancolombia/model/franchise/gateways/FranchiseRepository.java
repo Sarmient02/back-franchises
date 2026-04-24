@@ -7,4 +7,6 @@ public interface FranchiseRepository {
 
     Mono<Franchise> save(Franchise franchise);
 
+    Mono<Boolean> existsById(Long idFranchise);
+
 }

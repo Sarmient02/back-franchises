@@ -26,4 +26,9 @@ public class FranchiseReactiveRepositoryAdapter extends ReactiveAdapterOperation
                         ex -> new IllegalStateException("Franchise name already exists"));
     }
 
+    @Override
+    public Mono<Boolean> existsById(Long idFranchise) {
+        return repository.existsById(idFranchise);
+    }
+
 }
