@@ -16,4 +16,3 @@ public interface ProductMapper {
     Product toEntity(CreateProductRequestDTO request, Long idBranch);
 
 }
-

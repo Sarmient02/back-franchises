@@ -1,6 +1,5 @@
 package co.com.bancolombia.r2dbc.product.repository;
 
-import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.model.product.Product;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
@@ -29,8 +28,24 @@ public class ProductReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
+    public Mono<Product> findProductById(Long idProduct) {
+        return repository.findById(idProduct)
+                .map(this::toEntity);
+    }
+
+    @Override
     public Mono<Boolean> existsByIdBranchAndName(Long idBranch, String name) {
         return repository.existsByIdBranchAndName(idBranch, name);
+    }
+
+    @Override
+    public Mono<Boolean> existsProductById(Long idProduct) {
+        return repository.existsById(idProduct);
+    }
+
+    @Override
+    public Mono<Void> deleteProductById(Long idProduct) {
+        return repository.deleteById(idProduct);
     }
 
 }

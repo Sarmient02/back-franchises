@@ -11,6 +11,7 @@ import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -21,6 +22,8 @@ public class FranchiseRouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
+                    path = "/franchises",
+                    method = RequestMethod.POST,
                     beanClass = FranchiseHandler.class,
                     beanMethod = "createFranchise",
                     operation = @Operation(

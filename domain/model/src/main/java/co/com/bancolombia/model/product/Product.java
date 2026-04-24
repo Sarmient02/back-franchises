@@ -19,4 +19,3 @@ public class Product {
     private Integer stockQuantity;
 
 }
-

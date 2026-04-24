@@ -2,7 +2,6 @@ package co.com.bancolombia.r2dbc.branch.repository;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
-import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.r2dbc.branch.entity.BranchEntity;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;

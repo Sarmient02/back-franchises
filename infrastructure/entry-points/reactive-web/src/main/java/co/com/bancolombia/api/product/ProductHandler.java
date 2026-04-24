@@ -3,6 +3,7 @@ package co.com.bancolombia.api.product;
 import co.com.bancolombia.api.common.RequestValidator;
 import co.com.bancolombia.api.common.ResponseUtil;
 import co.com.bancolombia.api.product.dto.CreateProductRequestDTO;
+import co.com.bancolombia.api.product.dto.UpdateProductStockRequestDTO;
 import co.com.bancolombia.api.product.mappers.ProductMapper;
 import co.com.bancolombia.usecase.product.ProductUseCase;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Component
@@ -40,5 +42,35 @@ public class ProductHandler {
                 .onErrorResume(IllegalStateException.class, ex -> ResponseUtil.conflict(ex.getMessage()));
     }
 
-}
+    public Mono<ServerResponse> deleteProduct(ServerRequest request) {
+        Long idProduct;
+        try {
+            idProduct = Long.parseLong(request.pathVariable("idProduct"));
+        } catch (NumberFormatException exception) {
+            return ResponseUtil.badRequest("idProduct must be a number");
+        }
 
+        return productUseCase.deleteById(idProduct)
+                .then(ResponseUtil.ok(Map.of("message", "Product deleted successfully")))
+                .onErrorResume(IllegalArgumentException.class, ex -> ResponseUtil.badRequest(ex.getMessage()))
+                .onErrorResume(NoSuchElementException.class, ex -> ResponseUtil.notFound(ex.getMessage()));
+    }
+
+    public Mono<ServerResponse> patchProduct(ServerRequest request) {
+        Long idProduct;
+        try {
+            idProduct = Long.parseLong(request.pathVariable("idProduct"));
+        } catch (NumberFormatException exception) {
+            return ResponseUtil.badRequest("idProduct must be a number");
+        }
+
+        return request.bodyToMono(UpdateProductStockRequestDTO.class)
+                .doOnNext(requestValidator::validate)
+                .flatMap(body -> productUseCase.updateStock(idProduct, body.stockQuantity()))
+                .map(productMapper::toResponse)
+                .flatMap(ResponseUtil::ok)
+                .onErrorResume(IllegalArgumentException.class, ex -> ResponseUtil.badRequest(ex.getMessage()))
+                .onErrorResume(NoSuchElementException.class, ex -> ResponseUtil.notFound(ex.getMessage()));
+    }
+
+}

@@ -2,6 +2,7 @@ package co.com.bancolombia.api.product;
 
 import co.com.bancolombia.api.product.dto.CreateProductRequestDTO;
 import co.com.bancolombia.api.product.dto.ProductResponseDTO;
+import co.com.bancolombia.api.product.dto.UpdateProductStockRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +12,7 @@ import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -22,6 +24,8 @@ public class ProductRouterRest {
     @Bean
     @RouterOperations({
             @RouterOperation(
+                    path = "/branches/{idBranch}/products",
+                    method = RequestMethod.POST,
                     beanClass = ProductHandler.class,
                     beanMethod = "createProduct",
                     operation = @Operation(
@@ -46,11 +50,63 @@ public class ProductRouterRest {
                                             content = @Content(schema = @Schema(implementation = ProductResponseDTO.class))),
                                     @ApiResponse(responseCode = "404", description = "Branch not found")
                             }
+                    )),
+            @RouterOperation(
+                    path = "/products/{idProduct}",
+                    method = RequestMethod.DELETE,
+                    beanClass = ProductHandler.class,
+                    beanMethod = "deleteProduct",
+                    operation = @Operation(
+                            operationId = "deleteProduct",
+                            summary = "Delete a product",
+                            tags = {"Product"},
+                            parameters = {
+                                    @io.swagger.v3.oas.annotations.Parameter(
+                                            name = "idProduct",
+                                            description = "ID of the product to delete",
+                                            required = true,
+                                            in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH
+                                    )
+                            },
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
+                                    @ApiResponse(responseCode = "404", description = "Product not found")
+                            }
+                    )),
+            @RouterOperation(
+                    path = "/products/{idProduct}",
+                    method = RequestMethod.PATCH,
+                    beanClass = ProductHandler.class,
+                    beanMethod = "patchProduct",
+                    operation = @Operation(
+                            operationId = "patchProduct",
+                            summary = "Patch product",
+                            tags = {"Product"},
+                            parameters = {
+                                    @io.swagger.v3.oas.annotations.Parameter(
+                                            name = "idProduct",
+                                            description = "ID of the product to patch",
+                                            required = true,
+                                            in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH
+                                    )
+                            },
+                            requestBody = @RequestBody(
+                                    required = true,
+                                    description = "Fields to patch for the product",
+                                    content = @Content(schema = @Schema(implementation = UpdateProductStockRequestDTO.class))
+                            ),
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Product updated",
+                                            content = @Content(schema = @Schema(implementation = ProductResponseDTO.class))),
+                                    @ApiResponse(responseCode = "404", description = "Product not found")
+                            }
                     ))
     })
     public RouterFunction<ServerResponse> productRoutes(ProductHandler handler) {
         return route()
                 .POST("/branches/{idBranch}/products", handler::createProduct)
+                .DELETE("/products/{idProduct}", handler::deleteProduct)
+                .PATCH("/products/{idProduct}", handler::patchProduct)
                 .build();
     }
 

@@ -42,6 +42,34 @@ public class ProductUseCase {
                 });
     }
 
+    public Mono<Void> deleteById(Long idProduct) {
+        if (idProduct == null || idProduct <= 0) {
+            return Mono.error(new IllegalArgumentException("Product id is required"));
+        }
+
+        return productRepository.existsProductById(idProduct)
+                .flatMap(productExists -> {
+                    if (!productExists) {
+                        return Mono.error(new NoSuchElementException("Product not found"));
+                    }
+                    return productRepository.deleteProductById(idProduct);
+                });
+    }
+
+    public Mono<Product> updateStock(Long idProduct, Integer stockQuantity) {
+        if (idProduct == null || idProduct <= 0) {
+            return Mono.error(new IllegalArgumentException("Product id is required"));
+        }
+
+        Integer sanitizedStockQuantity = sanitizeStockQuantity(stockQuantity);
+
+        return productRepository.findProductById(idProduct)
+                .switchIfEmpty(Mono.error(new NoSuchElementException("Product not found")))
+                .flatMap(product -> productRepository.save(product.toBuilder()
+                        .stockQuantity(sanitizedStockQuantity)
+                        .build()));
+    }
+
     private String sanitizeName(String name) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Product name is required");
@@ -68,4 +96,3 @@ public class ProductUseCase {
     }
 
 }
-
