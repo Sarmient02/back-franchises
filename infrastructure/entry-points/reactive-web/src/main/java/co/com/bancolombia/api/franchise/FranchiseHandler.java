@@ -11,6 +11,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.NoSuchElementException;
+
 @Component
 @RequiredArgsConstructor
 public class FranchiseHandler {
@@ -31,6 +33,22 @@ public class FranchiseHandler {
                         ResponseUtil.badRequest(ex.getMessage()))
                 .onErrorResume(IllegalStateException.class, ex ->
                         ResponseUtil.conflict(ex.getMessage()));
+    }
+
+    public Mono<ServerResponse> getTopStockProductsByBranch(ServerRequest request) {
+        Long idFranchise;
+        try {
+            idFranchise = Long.parseLong(request.pathVariable("idFranchise"));
+        } catch (NumberFormatException exception) {
+            return ResponseUtil.badRequest("idFranchise must be a number");
+        }
+
+        return franchiseUseCase.getTopStockProductsByBranch(idFranchise)
+                .map(franchiseMapper::toTopStockProductByBranchResponse)
+                .collectList()
+                .flatMap(ResponseUtil::ok)
+                .onErrorResume(IllegalArgumentException.class, ex -> ResponseUtil.badRequest(ex.getMessage()))
+                .onErrorResume(NoSuchElementException.class, ex -> ResponseUtil.notFound(ex.getMessage()));
     }
 
 }

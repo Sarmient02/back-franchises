@@ -1,12 +1,14 @@
 package co.com.bancolombia.r2dbc.product.repository;
 
 import co.com.bancolombia.model.product.Product;
+import co.com.bancolombia.model.product.TopStockProductByBranch;
 import co.com.bancolombia.model.product.gateways.ProductRepository;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
 import co.com.bancolombia.r2dbc.product.entity.ProductEntity;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -48,5 +50,16 @@ public class ProductReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         return repository.deleteById(idProduct);
     }
 
-}
+    @Override
+    public Flux<TopStockProductByBranch> findTopStockProductsByFranchiseId(Long idFranchise) {
+        return repository.findTopStockProductsByFranchiseId(idFranchise)
+                .map(projection -> TopStockProductByBranch.builder()
+                        .id(projection.getId())
+                        .idBranch(projection.getIdBranch())
+                        .branchName(projection.getBranchName())
+                        .name(projection.getName())
+                        .stockQuantity(projection.getStockQuantity())
+                        .build());
+    }
 
+}
