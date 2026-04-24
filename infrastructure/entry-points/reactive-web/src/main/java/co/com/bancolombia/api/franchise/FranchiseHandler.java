@@ -3,6 +3,7 @@ package co.com.bancolombia.api.franchise;
 import co.com.bancolombia.api.common.RequestValidator;
 import co.com.bancolombia.api.common.ResponseUtil;
 import co.com.bancolombia.api.franchise.dto.CreateFranchiseRequestDTO;
+import co.com.bancolombia.api.franchise.dto.UpdateFranchiseNameRequestDTO;
 import co.com.bancolombia.api.franchise.mappers.FranchiseMapper;
 import co.com.bancolombia.model.exception.BusinessErrorType;
 import co.com.bancolombia.model.exception.BusinessException;
@@ -29,6 +30,16 @@ public class FranchiseHandler {
                 .map(franchiseMapper::toEntity)
                 .flatMap(franchiseUseCase::create)
                 .flatMap(ResponseUtil::created);
+    }
+
+    public Mono<ServerResponse> patchFranchise(ServerRequest request) {
+        Long idFranchise = parsePathVariable(request, "idFranchise");
+
+        return request.bodyToMono(UpdateFranchiseNameRequestDTO.class)
+                .doOnNext(requestValidator::validate)
+                .flatMap(body -> franchiseUseCase.updateName(idFranchise, body.name()))
+                .map(franchiseMapper::toResponse)
+                .flatMap(ResponseUtil::ok);
     }
 
     public Mono<ServerResponse> getTopStockProductsByBranch(ServerRequest request) {

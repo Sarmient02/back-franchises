@@ -3,6 +3,7 @@ package co.com.bancolombia.api.franchise;
 import co.com.bancolombia.api.franchise.dto.CreateFranchiseRequestDTO;
 import co.com.bancolombia.api.franchise.dto.FranchiseResponseDTO;
 import co.com.bancolombia.api.franchise.dto.TopStockProductByBranchResponseDTO;
+import co.com.bancolombia.api.franchise.dto.UpdateFranchiseNameRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,8 +39,37 @@ public class FranchiseRouterRest {
                                     content = @Content(schema = @Schema(implementation = CreateFranchiseRequestDTO.class))
                             ),
                             responses = {
-                                    @ApiResponse(responseCode = "200", description = "Successful operation",
+                                    @ApiResponse(responseCode = "201", description = "Franchise created",
                                             content = @Content(schema = @Schema(implementation = FranchiseResponseDTO.class)))}
+                    )),
+            @RouterOperation(
+                    path = "/franchises/{idFranchise}",
+                    method = RequestMethod.PATCH,
+                    beanClass = FranchiseHandler.class,
+                    beanMethod = "patchFranchise",
+                    operation = @Operation(
+                            operationId = "patchFranchise",
+                            summary = "Patch franchise",
+                            tags = {"Franchise"},
+                            parameters = {
+                                    @io.swagger.v3.oas.annotations.Parameter(
+                                            name = "idFranchise",
+                                            description = "ID of the franchise to update",
+                                            required = true,
+                                            in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH
+                                    )
+                            },
+                            requestBody = @RequestBody(
+                                    required = true,
+                                    description = "New name for the franchise",
+                                    content = @Content(schema = @Schema(implementation = UpdateFranchiseNameRequestDTO.class))
+                            ),
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "Franchise updated",
+                                            content = @Content(schema = @Schema(implementation = FranchiseResponseDTO.class))),
+                                    @ApiResponse(responseCode = "404", description = "Franchise not found"),
+                                    @ApiResponse(responseCode = "409", description = "Franchise name already exists")
+                            }
                     )),
             @RouterOperation(
                     path = "/franchises/{idFranchise}/products/top-stock-by-branch",
@@ -69,7 +99,9 @@ public class FranchiseRouterRest {
     public RouterFunction<ServerResponse> franchiseRoutes(FranchiseHandler handler) {
         return route()
                 .POST("/franchises", handler::createFranchise)
+                .PATCH("/franchises/{idFranchise}", handler::patchFranchise)
                 .GET("/franchises/{idFranchise}/products/top-stock-by-branch", handler::getTopStockProductsByBranch)
                 .build();
     }
 }
+
