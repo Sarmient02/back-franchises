@@ -2,6 +2,7 @@ package co.com.bancolombia.r2dbc.branch.repository;
 
 import co.com.bancolombia.model.branch.Branch;
 import co.com.bancolombia.model.branch.gateways.BranchRepository;
+import co.com.bancolombia.model.franchise.Franchise;
 import co.com.bancolombia.r2dbc.branch.entity.BranchEntity;
 import co.com.bancolombia.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
@@ -14,11 +15,7 @@ public class BranchReactiveRepositoryAdapter extends ReactiveAdapterOperations<B
         implements BranchRepository {
 
     public BranchReactiveRepositoryAdapter(IBranchReactiveRepository repository, ObjectMapper mapper) {
-        super(repository, mapper, data -> Branch.builder()
-                .id(data.getId())
-                .idFranchise(data.getIdFranchise())
-                .name(data.getName())
-                .build());
+        super(repository, mapper, d -> mapper.map(d, Branch.class));
     }
 
     @Override
@@ -34,6 +31,11 @@ public class BranchReactiveRepositoryAdapter extends ReactiveAdapterOperations<B
     @Override
     public Mono<Boolean> existsByIdFranchiseAndName(Long idFranchise, String name) {
         return repository.existsByIdFranchiseAndName(idFranchise, name);
+    }
+
+    @Override
+    public Mono<Boolean> existsById(Long idBranch) {
+        return repository.existsById(idBranch);
     }
 
 }

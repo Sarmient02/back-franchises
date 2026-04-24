@@ -9,6 +9,8 @@ public interface BranchRepository {
 
     Mono<Boolean> existsByIdFranchiseAndName(Long idFranchise, String name);
 
+    Mono<Boolean> existsById(Long idBranch);
+
 }
 
 
